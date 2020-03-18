@@ -21,11 +21,25 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <title>The guide to making Pokemon out of LEGO</title>
+  <style type='text/css'>
+    #root {
+      background-color: #eee;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
+    #root>div {
+      flex-grow: 1;
+    }
+
+    #root canvas {
+      flex-grow: 1;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Pokemon - Get building!</h1>
   <!--
   <p>
     Hello! This is a growing database of instructions for how to build various Pokemon out of LEGO. As you can see,
