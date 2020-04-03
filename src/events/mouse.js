@@ -22,3 +22,25 @@ export const useMousePosition = () => {
 
     return position;
 };
+
+export const HandleMouseDown = () => {
+    const [mouseDown, setMouseDown] = useState(false)
+    useEffect(() => {
+        const handleDocumentMouseDown = event => {
+            if (event.button !== 2) {
+                setMouseDown(true)
+                setTimeout(() => setMouseDown(false), 10)
+            }
+        }
+
+        // On mount
+        document.addEventListener('mousedown', handleDocumentMouseDown)
+
+        // When umounted
+        return () => {
+            document.removeEventListener('mousedown', handleDocumentMouseDown)
+        }
+    }, [])
+
+    return mouseDown
+}
