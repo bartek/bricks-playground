@@ -19,33 +19,18 @@ const RollOver = (props) => {
     )
 }
 
-const Cube = (props) => {
-    const { position } = props
-
-    return (
-        <mesh scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
-            <boxBufferGeometry attach="geometry" />
-            <meshBasicMaterial attach="material" color={0x274E13} opacity={1} transparent />
-        </mesh>
-    )
+// This must be a class component because we pass refs to it from PlaneEditor
+class Cube extends React.Component {
+    render() {
+        const { position } = this.props
+        return (
+            <mesh scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
+                <boxBufferGeometry attach="geometry" />
+                <meshBasicMaterial attach="material" color={0x274E13} opacity={1} transparent />
+            </mesh>
+        )
+    }
 }
-
-const BlockRender = (props) => {
-    const { blocks, hook } = props
-
-    hook(2)
-
-    return (
-        <>
-            {
-                blocks.map((block, idx) => {
-                    return <Cube key={idx} position={block.position} />
-                })
-            }
-        </>
-    )
-}
-
 
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
@@ -72,7 +57,6 @@ const PlaneEditor = (props) => {
             setBlocks([...blocks, newBlock])
 
             // Create a reference for the new block as well
-            console.log(setBlockRefs, blockRefs, createRef())
             setBlockRefs([...blockRefs, createRef()])
 
         }, 50)
@@ -83,9 +67,8 @@ const PlaneEditor = (props) => {
         const setBlockIntersections = () => {
             // Check for intersections against the block layer
             raycaster.setFromCamera(mouse.clone(), camera)
-            console.log("?", blockRefs)
+            console.log(blockRefs)
             let blockIntersects = raycaster.intersectObjects(blockRefs.filter(b => b.current).map(b => b.current))
-            console.log("!!!", blockIntersects)
         }
 
         window.addEventListener('mousemove', setBlockIntersections)
