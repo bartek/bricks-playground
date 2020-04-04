@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Canvas, useThree, extend, useFrame, Dom, stateContext } from 'react-three-fiber';
 import ReactDOM from 'react-dom'
-import { HandleMouseDown } from './events/mouse'
+import { useMouseDownHandler } from './events/mouse'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 extend({ OrbitControls })
@@ -30,6 +30,20 @@ const Cube = (props) => {
     )
 }
 
+const BlockRender = (props) => {
+    const { blocks } = props
+
+    return (
+        <>
+            {
+                blocks.map((block, idx) => {
+                    return <Cube key={idx} position={block.position} />
+                })
+            }
+        </>
+    )
+}
+
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
 const PlaneEditor = (props) => {
@@ -39,13 +53,9 @@ const PlaneEditor = (props) => {
     const [rolloverPosition, setRollover] = useState({ x: x, y: y, z: z })
     const [blocks, setBlocks] = useState([])
 
-    const isMouseDown = HandleMouseDown()
-
-    // Store potential intersections
-    const objects = []
+    const isMouseDown = useMouseDownHandler()
 
     const gridRef = useRef();
-    objects.push(gridRef)
 
     if (isMouseDown === true) {
         setTimeout(() => {
@@ -53,39 +63,46 @@ const PlaneEditor = (props) => {
                 position: rolloverPosition
             }
             setBlocks([...blocks, newBlock])
+            //  setObjects([...objects, newBlock])
 
         }, 50)
     }
 
-    // Called on every frame, set the rollover position
-    useFrame(state => {
+    useEffect(() => {
+        const setIntersections = e => {
+            raycaster.setFromCamera(mouse.clone(), camera)
 
-        raycaster.setFromCamera(mouse.clone(), camera)
 
-        let currentObjects = objects.filter(o => o.current).map(o => o.current)
-        let intersects = raycaster.intersectObjects(currentObjects)
-        if (intersects.length > 0) {
-            let intersect = intersects[0]
+            // Check for intersections against the grid helper
+            let intersects = raycaster.intersectObjects([gridRef.current])
 
-            // Store the new position in a Vector, so we can do vector match on it!
-            let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
+            if (intersects.length > 0) {
 
-            // Each cell is 5 in width (100 size, divisions 20 = 5)
-            newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
-            newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
-            newVec.y = 2.5 // FIXME.
-            setRollover(newVec)
+                // This is the grid intersection
+                let intersect = intersects[0]
 
+                // Store the new position in a Vector, so we can do vector match on it!
+                let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
+
+                // Each cell is 5 in width (100 size, divisions 20 = 5)
+                newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
+                newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
+                newVec.y = 2.5 // FIXME.
+                setRollover(newVec)
+            }
         }
-    })
 
-    console.log("??", blocks)
+        window.addEventListener('mousemove', setIntersections)
+        return () => {
+            window.removeEventListener('mousemove', setIntersections)
+        }
+    }, [])
 
     return (
         <group>
             <RollOver position={rolloverPosition} />
-            {blocks.map(block => {
-                return <Cube position={block.position} />
+            {blocks.map((block, idx) => {
+                return <Cube key={idx} position={block.position} />
             })}
             <gridHelper ref={gridRef}
                 args={[gridSize, divisions, 0x880000]}
