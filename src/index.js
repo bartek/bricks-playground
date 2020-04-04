@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, createRef } from 'react';
 import { Canvas, useThree, extend, useFrame, Dom, stateContext } from 'react-three-fiber';
 import ReactDOM from 'react-dom'
 import { useMouseDownHandler } from './events/mouse'
@@ -31,7 +31,9 @@ const Cube = (props) => {
 }
 
 const BlockRender = (props) => {
-    const { blocks } = props
+    const { blocks, hook } = props
+
+    hook(2)
 
     return (
         <>
@@ -44,6 +46,7 @@ const BlockRender = (props) => {
     )
 }
 
+
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
 const PlaneEditor = (props) => {
@@ -52,6 +55,10 @@ const PlaneEditor = (props) => {
 
     const [rolloverPosition, setRollover] = useState({ x: x, y: y, z: z })
     const [blocks, setBlocks] = useState([])
+
+    // TODO: Consider useReducer for this:
+    // https://reactjs.org/docs/hooks-reference.html#usereducer
+    const [blockRefs, setBlockRefs] = useState([])
 
     const isMouseDown = useMouseDownHandler()
 
@@ -63,19 +70,39 @@ const PlaneEditor = (props) => {
                 position: rolloverPosition
             }
             setBlocks([...blocks, newBlock])
-            //  setObjects([...objects, newBlock])
+
+            // Create a reference for the new block as well
+            console.log(setBlockRefs, blockRefs, createRef())
+            setBlockRefs([...blockRefs, createRef()])
 
         }, 50)
     }
 
+    // Check for intersection with blocks
     useEffect(() => {
-        const setIntersections = e => {
+        const setBlockIntersections = () => {
+            // Check for intersections against the block layer
             raycaster.setFromCamera(mouse.clone(), camera)
+            console.log("?", blockRefs)
+            let blockIntersects = raycaster.intersectObjects(blockRefs.filter(b => b.current).map(b => b.current))
+            console.log("!!!", blockIntersects)
+        }
 
+        window.addEventListener('mousemove', setBlockIntersections)
 
+        return () => {
+            window.removeEventListener('mousemove', setBlockIntersections)
+        }
+
+    }, [blockRefs])
+
+    // We want to know all the references to all blocks added, so we can check
+    // for intersection there.
+    useEffect(() => {
+        const setIntersections = () => {
             // Check for intersections against the grid helper
+            raycaster.setFromCamera(mouse.clone(), camera)
             let intersects = raycaster.intersectObjects([gridRef.current])
-
             if (intersects.length > 0) {
 
                 // This is the grid intersection
@@ -90,6 +117,7 @@ const PlaneEditor = (props) => {
                 newVec.y = 2.5 // FIXME.
                 setRollover(newVec)
             }
+
         }
 
         window.addEventListener('mousemove', setIntersections)
@@ -102,7 +130,7 @@ const PlaneEditor = (props) => {
         <group>
             <RollOver position={rolloverPosition} />
             {blocks.map((block, idx) => {
-                return <Cube key={idx} position={block.position} />
+                return <Cube key={idx} ref={blockRefs[idx]} position={block.position} />
             })}
             <gridHelper ref={gridRef}
                 args={[gridSize, divisions, 0x880000]}
