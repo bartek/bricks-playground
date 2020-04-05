@@ -22,9 +22,9 @@ const RollOver = (props) => {
 // This must be a class component because we pass refs to it from PlaneEditor
 class Cube extends React.Component {
     render() {
-        const { position } = this.props
+        const { position, inputRef } = this.props
         return (
-            <mesh scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
+            <mesh ref={inputRef} scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
                 <boxBufferGeometry attach="geometry" />
                 <meshBasicMaterial attach="material" color={0x274E13} opacity={1} transparent />
             </mesh>
@@ -62,22 +62,7 @@ const PlaneEditor = (props) => {
         }, 50)
     }
 
-    // Check for intersection with blocks
-    useEffect(() => {
-        const setBlockIntersections = () => {
-            // Check for intersections against the block layer
-            raycaster.setFromCamera(mouse.clone(), camera)
-            console.log(blockRefs)
-            let blockIntersects = raycaster.intersectObjects(blockRefs.filter(b => b.current).map(b => b.current))
-        }
 
-        window.addEventListener('mousemove', setBlockIntersections)
-
-        return () => {
-            window.removeEventListener('mousemove', setBlockIntersections)
-        }
-
-    }, [blockRefs])
 
     // We want to know all the references to all blocks added, so we can check
     // for intersection there.
@@ -91,29 +76,40 @@ const PlaneEditor = (props) => {
                 // This is the grid intersection
                 let intersect = intersects[0]
 
-                // Store the new position in a Vector, so we can do vector match on it!
+                // Store the new position in a Vector, so we can do vector math on it!
                 let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
 
                 // Each cell is 5 in width (100 size, divisions 20 = 5)
                 newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
                 newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
-                newVec.y = 2.5 // FIXME.
+
+                // Get the intersections for the blocks, and see if we have to jump up.
+                // We should also consider z/x of the blocks, since we don't want to jump "out of the grid
+                // we are on. Or, we may look at the intersect we've forced ourselves in, and use the intersecting
+                // block there. The latter may make more sense
+                let blockIntersects = raycaster.intersectObjects(blockRefs.filter(b => b.current).map(b => b.current))
+                if (blockIntersects.length > 0) {
+                    let block = blockIntersects[0]
+                    newVec.y = block.object.position.y + block.object.scale.y
+                } else {
+                    newVec.y = 2.5 // FIXME. We should normalize this somewhere else.
+                }
+
                 setRollover(newVec)
             }
-
         }
 
         window.addEventListener('mousemove', setIntersections)
         return () => {
             window.removeEventListener('mousemove', setIntersections)
         }
-    }, [])
+    }, [blockRefs])
 
     return (
         <group>
             <RollOver position={rolloverPosition} />
             {blocks.map((block, idx) => {
-                return <Cube key={idx} ref={blockRefs[idx]} position={block.position} />
+                return <Cube key={idx} inputRef={blockRefs[idx]} position={block.position} />
             })}
             <gridHelper ref={gridRef}
                 args={[gridSize, divisions, 0x880000]}
