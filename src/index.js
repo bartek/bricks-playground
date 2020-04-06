@@ -146,37 +146,7 @@ function Main(props) {
     </scene>
 }
 
-const HeadsUpDisplay = () => {
-    const scene = useRef()
-    const { camera } = useThree()
-    useFrame(({ gl }) => void ((gl.autoClear = false), gl.clearDepth(), gl.render(scene.current, camera)), 10)
-    return <scene ref={scene}>
-        <Dom position={[-100, 0, 0]}>
-        </Dom>
 
-    </scene>
-}
-
-// Within the canvas, so can useThree
-function Scene(props) {
-    const {
-        size,
-        setDefaultCamera,
-        camera,
-        gl: { domElement }
-    } = useThree()
-
-    return (
-        <>
-            <Main {...props} />
-            <HeadsUpDisplay />
-        </>
-    )
-}
-
-function saveScene() {
-
-}
 
 
 // Application scaffolding
@@ -190,7 +160,6 @@ function App() {
     }
 
     const [gridHelper, setGridHelper] = useState(true)
-
 
     const [x, setX] = useState(0)
     const [y, setY] = useState(0)
@@ -207,8 +176,7 @@ function App() {
                         </button>
                     </li>
                     <li>
-                        <button
-                            onClick={saveScene}>Save</button>
+                        <button>Save</button>
                     </li>
                 </ul>
             </div>
@@ -216,12 +184,12 @@ function App() {
                 resize={{ scroll: false }}
                 pixelRatio={window.devicePixelRatio}
                 camera={cameraProps}>
-                <Scene
+                <Main
                     gridHelper={gridHelper}
                     {...{ x: x, y: y, z: z }}
                 />
             </Canvas>
-        </div>
+        </div >
     )
 }
 ReactDOM.render(
