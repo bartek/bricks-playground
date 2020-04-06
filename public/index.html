@@ -21,45 +21,64 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <title>The guide to making Pokemon out of LEGO</title>
+  <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
   <style type='text/css'>
-    #root {
-      background-color: #eee;
+    body {
+      padding: 0;
+    }
+
+    .app {
+      background-color: #fff;
+      margin: 0;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
 
-    #root>div {
+    .app>div {
       flex-grow: 1;
     }
 
-    #root canvas {
+    .app canvas {
       flex-grow: 1;
+    }
+
+    .header {
+      background-color: #6D5ACf;
+      max-height: 20vh;
+    }
+
+    .header button {
+      background-color: #FFFD01;
+      color: rgb(15, 13, 13);
+      border: none;
+      margin-top: 12px;
+    }
+
+    .header ul {
+      list-style: none;
+      margin-top: 0;
+    }
+
+    .header ul>li {
+      padding: 0;
     }
   </style>
 </head>
 
 <body>
   <!--
-  <p>
-    Hello! This is a growing database of instructions for how to build various Pokemon out of LEGO. As you can see,
-    there's a lot of work to do yet.
-    Our goal is to tackle the original 150 first and specifically, looking to get them done in the "micro" style,
-    which was inspired by Pokemon Quest
-  </p>
-  <p>Want to contribute? We're working on making it easier. For now, please send us a completed photo of your pokemon
-    with as many useful angles as you can. We'll deconstruct it and map out the build process. Please also include
-    credit information so you can properly get attribution!</p>
+    Color Palette
+    https://colors.lol/ectophytic
 
-  <table>
-    <tr>
-      <td><img src='https://img.pokemondb.net/artwork/pikachu.jpg'></td>
-      <td>
-        <h2>Pikachu</h2>
-      </td>
-    </tr>
-  </table>
+    ectophytic light grey blue
+    #9DBCD4
+    store bright yellow
+    #FFFD01
+    undiagnosed light indigo
+    #6D5ACF
   -->
+
   <div id="root"></div>
 
 </body>

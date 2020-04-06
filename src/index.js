@@ -26,7 +26,7 @@ class Cube extends React.Component {
         return (
             <mesh ref={inputRef} scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
                 <boxBufferGeometry attach="geometry" />
-                <meshBasicMaterial attach="material" color={0x274E13} opacity={1} transparent />
+                <meshBasicMaterial attach="material" color={'orange'} opacity={1} />
             </mesh>
         )
     }
@@ -35,7 +35,12 @@ class Cube extends React.Component {
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
 const PlaneEditor = (props) => {
-    const { gridSize, divisions, x, y, z } = props;
+    // First, extract from expected props.
+    const {
+        gridSize,
+        divisions,
+        gridHelper,
+        x, y, z } = props;
     const { mouse, raycaster, camera } = useThree()
 
     const [rolloverPosition, setRollover] = useState({ x: x, y: y, z: z })
@@ -102,9 +107,11 @@ const PlaneEditor = (props) => {
             {blocks.map((block, idx) => {
                 return <Cube key={idx} inputRef={blockRefs[idx]} position={block.position} />
             })}
-            <gridHelper ref={gridRef}
-                args={[gridSize, divisions, 0x880000]}
-            />
+            {gridHelper &&
+                <gridHelper ref={gridRef}
+                    args={[gridSize, divisions, 0x880000]}
+                />
+            }
         </group>
     )
 }
@@ -117,11 +124,13 @@ function Main(props) {
         gl: { domElement }
     } = useThree()
 
+
     useFrame(({ gl }) => void ((gl.autoClear = true), gl.render(scene.current, camera)), 100)
 
     return <scene ref={scene}>
         <orbitControls args={[camera, domElement]} />
         <ambientLight />
+        <pointLight position={[250, 400, 700]} />
         <PlaneEditor {...props} gridSize={100} divisions={20} />
     </scene>
 }
@@ -165,21 +174,35 @@ function App() {
         far: 10000
     }
 
+    const [gridHelper, setGridHelper] = useState(true)
+
+
     const [x, setX] = useState(0)
     const [y, setY] = useState(0)
     const [z, setZ] = useState(0)
 
     return (
-        <>
-            <div>
-                <label>x: <input type='text' onChange={e => setX(parseInt(e.target.value))} /></label>
-                <label>y: <input type='text' onChange={e => setY(parseInt(e.target.value))} /></label>
-                <label>z: <input type='text' onChange={e => setZ(parseInt(e.target.value))} /></label>
+        <div className="app">
+            <div className="header">
+                <ul>
+                    <li>
+                        <button
+                            onClick={() => setGridHelper(!gridHelper)}>
+                            Grid On/Off
+                        </button>
+                    </li>
+                </ul>
             </div>
-            <Canvas resize={{ scroll: false }} pixelRatio={window.devicePixelRatio} camera={cameraProps}>
-                <Scene {...{ x: x, y: y, z: z }} />
+            <Canvas
+                resize={{ scroll: false }}
+                pixelRatio={window.devicePixelRatio}
+                camera={cameraProps}>
+                <Scene
+                    gridHelper={gridHelper}
+                    {...{ x: x, y: y, z: z }}
+                />
             </Canvas>
-        </>
+        </div>
     )
 }
 ReactDOM.render(
