@@ -63,38 +63,29 @@ const PlaneEditor = (props) => {
     }
 
 
-
     // We want to know all the references to all blocks added, so we can check
     // for intersection there.
     useEffect(() => {
         const setIntersections = () => {
+
             // Check for intersections against the grid helper
             raycaster.setFromCamera(mouse.clone(), camera)
-            let intersects = raycaster.intersectObjects([gridRef.current])
+            let brickObjects = blockRefs.filter(b => b.current).map(b => b.current)
+            let intersects = raycaster.intersectObjects([...brickObjects, gridRef.current], true)
             if (intersects.length > 0) {
 
                 // This is the grid intersection
                 let intersect = intersects[0]
 
                 // Store the new position in a Vector, so we can do vector math on it!
+                // FIXME: There may be better ways, by copying the position of the intersect.point
+                // And adding the face, etc. Not sure why yet, so hold off on that for now.
                 let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
 
                 // Each cell is 5 in width (100 size, divisions 20 = 5)
                 newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
                 newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
-
-                // Get the intersections for the blocks, and see if we have to jump up.
-                // We should also consider z/x of the blocks, since we don't want to jump "out of the grid
-                // we are on. Or, we may look at the intersect we've forced ourselves in, and use the intersecting
-                // block there. The latter may make more sense
-                let blockIntersects = raycaster.intersectObjects(blockRefs.filter(b => b.current).map(b => b.current))
-                if (blockIntersects.length > 0) {
-                    let block = blockIntersects[0]
-                    newVec.y = block.object.position.y + block.object.scale.y
-                } else {
-                    newVec.y = 2.5 // FIXME. We should normalize this somewhere else.
-                }
-
+                newVec.y = (Math.round(newVec.y / 5) * 5) + 2.5
                 setRollover(newVec)
             }
         }
