@@ -53,6 +53,8 @@ const PlaneEditor = (props) => {
     const isMouseDown = useMouseDownHandler()
 
     const gridRef = useRef();
+    const planeRef = useRef();
+    const planeGeoRef = useRef();
 
     if (isMouseDown === true) {
         setTimeout(() => {
@@ -63,6 +65,7 @@ const PlaneEditor = (props) => {
 
             // Create a reference for the new block as well
             setBlockRefs([...blockRefs, createRef()])
+
 
         }, 50)
     }
@@ -76,7 +79,7 @@ const PlaneEditor = (props) => {
             // Check for intersections against the grid helper
             raycaster.setFromCamera(mouse.clone(), camera)
             let brickObjects = blockRefs.filter(b => b.current).map(b => b.current)
-            let intersects = raycaster.intersectObjects([...brickObjects, gridRef.current], true)
+            let intersects = raycaster.intersectObjects([...brickObjects, planeRef.current], true)
             if (intersects.length > 0) {
 
                 // This is the grid intersection
@@ -101,9 +104,17 @@ const PlaneEditor = (props) => {
         }
     }, [blockRefs])
 
+    useEffect(() => {
+        planeGeoRef.current.rotateX(-Math.PI / 2)
+    }, [])
+
     return (
         <group>
             <RollOver position={rolloverPosition} />
+            <mesh ref={planeRef}>
+                <planeBufferGeometry ref={planeGeoRef} attach="geometry" args={[1000, 1000]} />
+                <meshBasicMaterial attach="material" />
+            </mesh>
             {blocks.map((block, idx) => {
                 return <Cube key={idx} inputRef={blockRefs[idx]} position={block.position} />
             })}
@@ -163,6 +174,10 @@ function Scene(props) {
     )
 }
 
+function saveScene() {
+
+}
+
 
 // Application scaffolding
 function App() {
@@ -190,6 +205,10 @@ function App() {
                             onClick={() => setGridHelper(!gridHelper)}>
                             Grid On/Off
                         </button>
+                    </li>
+                    <li>
+                        <button
+                            onClick={saveScene}>Save</button>
                     </li>
                 </ul>
             </div>
