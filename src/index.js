@@ -3,10 +3,17 @@ import ReactDOM from 'react-dom'
 import { Canvas, extend, useFrame, useThree, useResource } from 'react-three-fiber'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { useMouseDownHandler } from './events/mouse'
+import { useMouseDown } from './events/mouse'
 import { useRolloverPosition } from './events/rollover'
+import {
+    saveToLocalStorage,
+    restoreFromLocalStorage
+} from './data/localStorage'
 
 extend({ OrbitControls })
+
+// Globals are OK, sometimes, right?
+// localStorage stuff
 
 
 const RollOver = (props) => {
@@ -36,26 +43,25 @@ class Cube extends React.Component {
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
 const PlaneEditor = (props) => {
-    // First, extract from expected props.
     const {
+        elements, // Initial elements (blocks) to render
         gridSize,
         divisions,
         gridHelper,
         x, y, z } = props;
-    const { mouse, raycaster, camera } = useThree()
 
-    const [blocks, setBlocks] = useState([])
+    const [blocks, setBlocks] = useState(elements)
 
     // TODO: Consider useReducer for this:
     // https://reactjs.org/docs/hooks-reference.html#usereducer
     const [blockRefs, setBlockRefs] = useState([])
 
-    const isMouseDown = useMouseDownHandler()
-
     const gridRef = useRef();
     const planeRef = useRef();
-    const planeGeoRef = useRef();
 
+    const isMouseDown = useMouseDown()
+
+    // Placing a block
     if (isMouseDown === true) {
         setTimeout(() => {
             const newBlock = {
@@ -65,6 +71,9 @@ const PlaneEditor = (props) => {
 
             // Create a reference for the new block as well
             setBlockRefs([...blockRefs, createRef()])
+
+            // Nudge the rollover position to update.
+            window.dispatchEvent(new Event('mousemove'))
 
         }, 50)
     }
@@ -76,23 +85,24 @@ const PlaneEditor = (props) => {
         planeRef.current
     ])
 
-    // Rotate the plane so we draw as expected
+    // Update localStorage on each change in blocks
     useEffect(() => {
-        planeGeoRef.current.rotateX(-Math.PI / 2)
-    }, [])
+        saveToLocalStorage(blocks)
+    }, [blocks])
+
 
     return (
         <group>
-
             <ambientLight />
-
             <RollOver position={rolloverPosition} />
-            <mesh ref={planeRef}>
+            <mesh ref={planeRef} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeBufferGeometry
-                    ref={planeGeoRef}
                     attach="geometry"
                     args={[100, 100]} />
-                <meshBasicMaterial attach="material" opacity={0} />
+                <meshBasicMaterial
+                    attach="material"
+                    flatShading
+                />
             </mesh>
             {blocks.map((block, idx) => {
                 return <Cube key={idx} inputRef={blockRefs[idx]} position={block.position} />
@@ -141,10 +151,14 @@ function App() {
     const [y, setY] = useState(0)
     const [z, setZ] = useState(0)
 
+    // Load elements from localStorage
+    const elements = restoreFromLocalStorage()
+
     return (
         <div className="app">
             <div className="header">
                 <ul>
+                    <li><button>Brick</button></li>
                     <li>
                         <button
                             onClick={() => setGridHelper(!gridHelper)}>
@@ -161,6 +175,7 @@ function App() {
                 pixelRatio={window.devicePixelRatio}
                 camera={cameraProps}>
                 <Main
+                    elements={elements}
                     gridHelper={gridHelper}
                     {...{ x: x, y: y, z: z }}
                 />

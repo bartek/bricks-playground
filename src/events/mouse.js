@@ -23,7 +23,7 @@ export const useMousePosition = () => {
     return position;
 };
 
-export const useMouseDownHandler = () => {
+export const useMouseDown = () => {
     const [mouseDown, setMouseDown] = useState(false)
     useEffect(() => {
         const handleDocumentMouseDown = event => {

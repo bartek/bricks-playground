@@ -5,6 +5,7 @@ import * as THREE from 'three'
 // We want to know all the references to all blocks added, so we can check
 // for intersection there.
 
+// TODO: Needs to consider block currently being used.
 export const useRolloverPosition = (references) => {
     const {
         raycaster,
@@ -16,6 +17,11 @@ export const useRolloverPosition = (references) => {
 
     useEffect(() => {
         const setIntersections = () => {
+
+            // Exit early if references contain an undefined value
+            if (references[0] === undefined) {
+                return
+            }
 
             // Check for intersections against the grid helper
             raycaster.setFromCamera(mouse.clone(), camera)
@@ -37,7 +43,6 @@ export const useRolloverPosition = (references) => {
                 setRollover(newVec)
             }
         }
-
         window.addEventListener('mousemove', setIntersections)
         return () => {
             window.removeEventListener('mousemove', setIntersections)

@@ -1,9 +1,32 @@
+# Wednesday April 9 2020
+
+[ ] Add one test. Block placement calculation
+
+# Tuesday April 7 2020
+
+Reading:
+
+https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html
+
+[ ] Migrate to TypesScript
+[ ] Start using Constants and treat Cube as 2x2 square
+[ ] Abstract Cube into its own module
+[ ] Drop any notion of "default" sizing, size based on cube/block
+[ ] Add lego brick material (https://github.com/nicmosc/brick-builder/blob/master/app/components/engine/Brick.js)
+
 # Monday April 6 2020
 
 [x] Look into fixing camera (see: https://threejs.org/docs/#api/en/helpers/PointLightHelper )
-[ ] On placement, reposition rollover, not relying on mousemove
-[ ] Start using Constants and treat Cube as 2x2 square
-[ ] Implement saving scene to localStorage. Requires structuring of app
+[x] On placement, reposition rollover, not relying on mousemove
+
+[x] Implement saving scene to localStorage. Requires structuring of app
+
+How will state work?
+
+Keep it to auto save for tonight
+
+On object add, update localStorage. Passive save
+What do we add? I suppose, all the block references? If we have those in the array, we can load them
 
 Continue to focus on the idea:
 
