@@ -1,9 +1,10 @@
-import * as THREE from 'three'
-import React, { useState, useRef, useEffect, createRef } from 'react';
-import { Canvas, useThree, extend, useFrame, Dom, stateContext } from 'react-three-fiber';
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { useMouseDownHandler } from './events/mouse'
+import { Canvas, extend, useFrame, useThree, useResource } from 'react-three-fiber'
+import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { useMouseDownHandler } from './events/mouse'
+import { useRolloverPosition } from './events/rollover'
 
 extend({ OrbitControls })
 
@@ -26,7 +27,7 @@ class Cube extends React.Component {
         return (
             <mesh ref={inputRef} scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
                 <boxBufferGeometry attach="geometry" />
-                <meshBasicMaterial attach="material" color={'orange'} opacity={1} />
+                <meshNormalMaterial attach="material" />
             </mesh>
         )
     }
@@ -43,7 +44,6 @@ const PlaneEditor = (props) => {
         x, y, z } = props;
     const { mouse, raycaster, camera } = useThree()
 
-    const [rolloverPosition, setRollover] = useState({ x: x, y: y, z: z })
     const [blocks, setBlocks] = useState([])
 
     // TODO: Consider useReducer for this:
@@ -66,54 +66,33 @@ const PlaneEditor = (props) => {
             // Create a reference for the new block as well
             setBlockRefs([...blockRefs, createRef()])
 
-
         }, 50)
     }
 
+    // Capture the rollover position, in consideration of the
+    // existing blocks and base plane.
+    const rolloverPosition = useRolloverPosition([
+        ...blockRefs.filter(b => b.current).map(b => b.current),
+        planeRef.current
+    ])
 
-    // We want to know all the references to all blocks added, so we can check
-    // for intersection there.
-    useEffect(() => {
-        const setIntersections = () => {
-
-            // Check for intersections against the grid helper
-            raycaster.setFromCamera(mouse.clone(), camera)
-            let brickObjects = blockRefs.filter(b => b.current).map(b => b.current)
-            let intersects = raycaster.intersectObjects([...brickObjects, planeRef.current], true)
-            if (intersects.length > 0) {
-
-                // This is the grid intersection
-                let intersect = intersects[0]
-
-                // Store the new position in a Vector, so we can do vector math on it!
-                // FIXME: There may be better ways, by copying the position of the intersect.point
-                // And adding the face, etc. Not sure why yet, so hold off on that for now.
-                let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
-
-                // Each cell is 5 in width (100 size, divisions 20 = 5)
-                newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
-                newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
-                newVec.y = (Math.round(newVec.y / 5) * 5) + 2.5
-                setRollover(newVec)
-            }
-        }
-
-        window.addEventListener('mousemove', setIntersections)
-        return () => {
-            window.removeEventListener('mousemove', setIntersections)
-        }
-    }, [blockRefs])
-
+    // Rotate the plane so we draw as expected
     useEffect(() => {
         planeGeoRef.current.rotateX(-Math.PI / 2)
     }, [])
 
     return (
         <group>
+
+            <ambientLight />
+
             <RollOver position={rolloverPosition} />
             <mesh ref={planeRef}>
-                <planeBufferGeometry ref={planeGeoRef} attach="geometry" args={[1000, 1000]} />
-                <meshBasicMaterial attach="material" />
+                <planeBufferGeometry
+                    ref={planeGeoRef}
+                    attach="geometry"
+                    args={[100, 100]} />
+                <meshBasicMaterial attach="material" opacity={0} />
             </mesh>
             {blocks.map((block, idx) => {
                 return <Cube key={idx} inputRef={blockRefs[idx]} position={block.position} />
@@ -135,13 +114,10 @@ function Main(props) {
         gl: { domElement }
     } = useThree()
 
-
     useFrame(({ gl }) => void ((gl.autoClear = true), gl.render(scene.current, camera)), 100)
 
     return <scene ref={scene}>
         <orbitControls args={[camera, domElement]} />
-        <ambientLight />
-        <pointLight position={[250, 400, 700]} />
         <PlaneEditor {...props} gridSize={100} divisions={20} />
     </scene>
 }

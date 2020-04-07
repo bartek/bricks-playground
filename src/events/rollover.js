@@ -1,0 +1,48 @@
+import React, { useState, useEffect } from 'react'
+import { useThree } from 'react-three-fiber'
+import * as THREE from 'three'
+
+// We want to know all the references to all blocks added, so we can check
+// for intersection there.
+
+export const useRolloverPosition = (references) => {
+    const {
+        raycaster,
+        mouse,
+        camera
+    } = useThree()
+
+    const [rolloverPosition, setRollover] = useState({ x: 0, y: 0, z: 0 })
+
+    useEffect(() => {
+        const setIntersections = () => {
+
+            // Check for intersections against the grid helper
+            raycaster.setFromCamera(mouse.clone(), camera)
+            let intersects = raycaster.intersectObjects(references, true)
+            if (intersects.length > 0) {
+
+                // This is the grid intersection
+                let intersect = intersects[0]
+
+                // Store the new position in a Vector, so we can do vector math on it!
+                // FIXME: There may be better ways, by copying the position of the intersect.point
+                // And adding the face, etc. Not sure why yet, so hold off on that for now.
+                let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
+
+                // Each cell is 5 in width (100 size, divisions 20 = 5)
+                newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
+                newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
+                newVec.y = (Math.round(newVec.y / 5) * 5) + 2.5
+                setRollover(newVec)
+            }
+        }
+
+        window.addEventListener('mousemove', setIntersections)
+        return () => {
+            window.removeEventListener('mousemove', setIntersections)
+        }
+    })
+
+    return rolloverPosition
+}
