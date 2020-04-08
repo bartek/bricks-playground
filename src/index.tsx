@@ -1,6 +1,6 @@
 import React, { createRef, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { Canvas, extend, useFrame, useThree, useResource } from 'react-three-fiber'
+import { Canvas, extend, useThree, ReactThreeFiber } from 'react-three-fiber'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useMouseDown } from './events/mouse'
@@ -9,14 +9,30 @@ import {
     saveToLocalStorage,
     restoreFromLocalStorage
 } from './data/localStorage'
+import { Element } from './types'
 
 extend({ OrbitControls })
+
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            'orbitControls': ReactThreeFiber.Object3DNode<OrbitControls, typeof OrbitControls>;
+        }
+    }
+}
 
 // Globals are OK, sometimes, right?
 // localStorage stuff
 
+type RolloverPosition = {
+    x: number,
+    y: number,
+    z: number
+}
 
-const RollOver = (props) => {
+function RollOver(props: {
+    position: RolloverPosition
+}) {
     const { position } = props
 
     return (
@@ -27,8 +43,15 @@ const RollOver = (props) => {
     )
 }
 
+
 // This must be a class component because we pass refs to it from PlaneEditor
-class Cube extends React.Component {
+
+type CubeProps = {
+    key: number;
+    position: RolloverPosition;
+    inputRef: any;
+}
+class Cube extends React.Component<CubeProps> {
     render() {
         const { position, inputRef } = this.props
         return (
@@ -42,19 +65,27 @@ class Cube extends React.Component {
 
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
-const PlaneEditor = (props) => {
+
+type EditorType = {
+    elements: Element[];
+    gridSize: number;
+    divisions: number;
+    gridHelper: boolean;
+}
+
+const PlaneEditor = (props: EditorType) => {
     const {
         elements, // Initial elements (blocks) to render
         gridSize,
         divisions,
         gridHelper,
-        x, y, z } = props;
+    } = props;
 
     const [blocks, setBlocks] = useState(elements)
 
     // TODO: Consider useReducer for this:
     // https://reactjs.org/docs/hooks-reference.html#usereducer
-    const [blockRefs, setBlockRefs] = useState([])
+    const [blockRefs, setBlockRefs] = useState<React.RefObject<HTMLDivElement>[]>([])
 
     const gridRef = useRef();
     const planeRef = useRef();
@@ -81,7 +112,7 @@ const PlaneEditor = (props) => {
     // Capture the rollover position, in consideration of the
     // existing blocks and base plane.
     const rolloverPosition = useRolloverPosition([
-        ...blockRefs.filter(b => b.current).map(b => b.current),
+        ...blockRefs.filter((b: React.RefObject<any>) => b.current).map((b: React.RefObject<any>) => b.current),
         planeRef.current
     ])
 
@@ -117,14 +148,18 @@ const PlaneEditor = (props) => {
 }
 
 
-function Main(props) {
+type MainProps = {
+    elements: Element[];
+    gridHelper: boolean;
+}
+function Main(props: MainProps) {
     const scene = useRef()
     const {
         camera,
         gl: { domElement }
     } = useThree()
 
-    useFrame(({ gl }) => void ((gl.autoClear = true), gl.render(scene.current, camera)), 100)
+    //useFrame(({gl}) => void ((gl.autoClear = true), gl.render(scene.current, camera)), 100)
 
     return <scene ref={scene}>
         <orbitControls args={[camera, domElement]} />
@@ -147,9 +182,6 @@ function App() {
 
     const [gridHelper, setGridHelper] = useState(true)
 
-    const [x, setX] = useState(0)
-    const [y, setY] = useState(0)
-    const [z, setZ] = useState(0)
 
     // Load elements from localStorage
     const elements = restoreFromLocalStorage()
@@ -177,7 +209,6 @@ function App() {
                 <Main
                     elements={elements}
                     gridHelper={gridHelper}
-                    {...{ x: x, y: y, z: z }}
                 />
             </Canvas>
         </div >

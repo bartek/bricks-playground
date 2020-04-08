@@ -1,10 +1,14 @@
+import { Element } from "../types"
+
 const LOCAL_STORAGE_KEY = "bricks"
 
-const restore = (elements) => {
+const restore = (
+    elements: Element[],
+) => {
     return elements
 }
 
-export const saveToLocalStorage = (elements) => {
+export const saveToLocalStorage = (elements: Element[]) => {
     localStorage.setItem(
         LOCAL_STORAGE_KEY,
         JSON.stringify(elements)

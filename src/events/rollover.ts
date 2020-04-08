@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useThree } from 'react-three-fiber'
 import * as THREE from 'three'
+import { Object3D } from 'three'
 
 // We want to know all the references to all blocks added, so we can check
 // for intersection there.
 
 // TODO: Needs to consider block currently being used.
-export const useRolloverPosition = (references) => {
+export const useRolloverPosition = (references: Object3D[]) => {
     const {
         raycaster,
         mouse,

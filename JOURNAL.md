@@ -8,7 +8,7 @@ Reading:
 
 https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html
 
-[ ] Migrate to TypesScript
+[x] Migrate to TypeScript
 [ ] Start using Constants and treat Cube as 2x2 square
 [ ] Abstract Cube into its own module
 [ ] Drop any notion of "default" sizing, size based on cube/block
