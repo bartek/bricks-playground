@@ -1,10 +1,10 @@
-import React, { createRef, useMemo, useEffect, useRef, useState } from 'react'
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Canvas, extend, useThree, ReactThreeFiber } from 'react-three-fiber'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useMouseDown } from './events/mouse'
-import { useRolloverPosition } from './events/rollover'
+import { useRolloverPosition, useMouseOnCanvas } from './events/rollover'
 import {
     clearStorage,
     saveToLocalStorage,
@@ -70,9 +70,9 @@ const PlaneEditor = (props: EditorType) => {
     const planeRef = useRef();
 
     const isMouseDown = useMouseDown()
+    const isMouseOnCanvas = useMouseOnCanvas()
 
-    // Placing a block
-    if (isMouseDown === true) {
+    if (isMouseOnCanvas && isMouseDown) {
         setTimeout(() => {
             const newBlock = {
                 position: rolloverPosition
@@ -101,9 +101,6 @@ const PlaneEditor = (props: EditorType) => {
     useEffect(() => {
         saveToLocalStorage(blocks)
     }, [blocks])
-
-
-
 
     return (
         <group>

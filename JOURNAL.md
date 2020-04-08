@@ -1,5 +1,8 @@
 # Wednesday April 9 2020
 
+[x] Fixed issue in restoring references from localStorage
+[x] Added useMouseOnCanvas hook to prevent misplaced bricks
+
 [ ] When we add a brick, we need to know its type, and then use that when rendering all the bricks (in blocks.map in PlaneEditor)
 [ ] Add Rectangle, and ensure Rollover considers current brick
 [ ] Add one test. Block placement calculation

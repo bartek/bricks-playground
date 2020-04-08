@@ -3,8 +3,32 @@ import { useThree } from 'react-three-fiber'
 import * as THREE from 'three'
 import { Object3D } from 'three'
 
-// We want to know all the references to all blocks added, so we can check
-// for intersection there.
+// Capture if the mouse is on canvas, to prevent misplacement
+// of blocks
+export const useMouseOnCanvas = () => {
+    const [mouseOnCanvas, setMouseOnCanvas] = useState(false)
+
+    useEffect(() => {
+        const onMouseMove = () => {
+            // If we are not hovering over canvas, exit early
+            let mouseOnCanvas = [...document.querySelectorAll(":hover")].filter(
+                node => node.tagName === "CANVAS"
+            )
+
+            if (mouseOnCanvas.length > 0) {
+                setMouseOnCanvas(true)
+            } else {
+                setMouseOnCanvas(false)
+            }
+        }
+        window.addEventListener('mousemove', onMouseMove)
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove)
+        }
+    })
+
+    return mouseOnCanvas
+}
 
 // TODO: Needs to consider block currently being used.
 export const useRolloverPosition = (references: Object3D[]) => {
@@ -23,6 +47,7 @@ export const useRolloverPosition = (references: Object3D[]) => {
             if (references[0] === undefined) {
                 return
             }
+
 
             // Check for intersections against the grid helper
             raycaster.setFromCamera(mouse.clone(), camera)
