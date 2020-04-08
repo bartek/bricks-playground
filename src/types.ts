@@ -8,4 +8,11 @@ export type Element = {
     }
 }
 
+
+export type RolloverPosition = {
+    x: number,
+    y: number,
+    z: number
+}
+
 export type Plane = Object3D

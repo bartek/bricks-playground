@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useRef, useState } from 'react'
+import React, { createRef, useMemo, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Canvas, extend, useThree, ReactThreeFiber } from 'react-three-fiber'
 import * as THREE from 'three'
@@ -6,28 +6,23 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useMouseDown } from './events/mouse'
 import { useRolloverPosition } from './events/rollover'
 import {
+    clearStorage,
     saveToLocalStorage,
     restoreFromLocalStorage
 } from './data/localStorage'
-import { Element } from './types'
+import { Cube, Rectangle } from './components/Cube'
+import { Element, RolloverPosition } from './types'
 
 extend({ OrbitControls })
 
+// This is necessary because OrbitControls complains about the lack
+// of this interface otherwise
 declare global {
     namespace JSX {
         interface IntrinsicElements {
             'orbitControls': ReactThreeFiber.Object3DNode<OrbitControls, typeof OrbitControls>;
         }
     }
-}
-
-// Globals are OK, sometimes, right?
-// localStorage stuff
-
-type RolloverPosition = {
-    x: number,
-    y: number,
-    z: number
 }
 
 function RollOver(props: {
@@ -43,32 +38,13 @@ function RollOver(props: {
     )
 }
 
-
-// This must be a class component because we pass refs to it from PlaneEditor
-
-type CubeProps = {
-    key: number;
-    position: RolloverPosition;
-    inputRef: any;
-}
-class Cube extends React.Component<CubeProps> {
-    render() {
-        const { position, inputRef } = this.props
-        return (
-            <mesh ref={inputRef} scale={[5, 5, 5]} position={[position.x, position.y, position.z]}>
-                <boxBufferGeometry attach="geometry" />
-                <meshNormalMaterial attach="material" />
-            </mesh>
-        )
-    }
-}
-
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
 
 type EditorType = {
     elements: Element[];
     gridSize: number;
+    currentBrick: string;
     divisions: number;
     gridHelper: boolean;
 }
@@ -78,6 +54,7 @@ const PlaneEditor = (props: EditorType) => {
         elements, // Initial elements (blocks) to render
         gridSize,
         divisions,
+        currentBrick,
         gridHelper,
     } = props;
 
@@ -85,7 +62,9 @@ const PlaneEditor = (props: EditorType) => {
 
     // TODO: Consider useReducer for this:
     // https://reactjs.org/docs/hooks-reference.html#usereducer
-    const [blockRefs, setBlockRefs] = useState<React.RefObject<HTMLDivElement>[]>([])
+    const [blockRefs, setBlockRefs] = useState<React.RefObject<HTMLDivElement>[]>(
+        Array.from({ length: elements.length }, a => createRef())
+    )
 
     const gridRef = useRef();
     const planeRef = useRef();
@@ -112,7 +91,9 @@ const PlaneEditor = (props: EditorType) => {
     // Capture the rollover position, in consideration of the
     // existing blocks and base plane.
     const rolloverPosition = useRolloverPosition([
-        ...blockRefs.filter((b: React.RefObject<any>) => b.current).map((b: React.RefObject<any>) => b.current),
+        ...blockRefs.filter(
+            (b: React.RefObject<any>) => b.current
+        ).map((b: React.RefObject<any>) => b.current),
         planeRef.current
     ])
 
@@ -120,6 +101,8 @@ const PlaneEditor = (props: EditorType) => {
     useEffect(() => {
         saveToLocalStorage(blocks)
     }, [blocks])
+
+
 
 
     return (
@@ -150,6 +133,7 @@ const PlaneEditor = (props: EditorType) => {
 
 type MainProps = {
     elements: Element[];
+    currentBrick: string;
     gridHelper: boolean;
 }
 function Main(props: MainProps) {
@@ -181,7 +165,7 @@ function App() {
     }
 
     const [gridHelper, setGridHelper] = useState(true)
-
+    const [currentBrick, setCurrentBrick] = useState('cube')
 
     // Load elements from localStorage
     const elements = restoreFromLocalStorage()
@@ -190,7 +174,8 @@ function App() {
         <div className="app">
             <div className="header">
                 <ul>
-                    <li><button>Brick</button></li>
+                    <li><button onClick={() => setCurrentBrick('cube')}>Cube</button></li>
+                    <li><button onClick={() => setCurrentBrick('rectangle')}>Rectangle</button></li>
                     <li>
                         <button
                             onClick={() => setGridHelper(!gridHelper)}>
@@ -198,7 +183,7 @@ function App() {
                         </button>
                     </li>
                     <li>
-                        <button>Save</button>
+                        <button onClick={() => clearStorage()}>Erase</button>
                     </li>
                 </ul>
             </div>
@@ -208,6 +193,7 @@ function App() {
                 camera={cameraProps}>
                 <Main
                     elements={elements}
+                    currentBrick={currentBrick}
                     gridHelper={gridHelper}
                 />
             </Canvas>

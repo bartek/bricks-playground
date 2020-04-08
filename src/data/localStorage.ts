@@ -8,6 +8,10 @@ const restore = (
     return elements
 }
 
+export const clearStorage = () => {
+    return localStorage.removeItem(LOCAL_STORAGE_KEY)
+}
+
 export const saveToLocalStorage = (elements: Element[]) => {
     localStorage.setItem(
         LOCAL_STORAGE_KEY,

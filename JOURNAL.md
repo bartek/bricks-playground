@@ -1,6 +1,12 @@
 # Wednesday April 9 2020
 
+[ ] When we add a brick, we need to know its type, and then use that when rendering all the bricks (in blocks.map in PlaneEditor)
+[ ] Add Rectangle, and ensure Rollover considers current brick
 [ ] Add one test. Block placement calculation
+[ ] Start using Constants and treat Cube as 2x2 square
+[ ] Abstract Cube into its own module
+[ ] Drop any notion of "default" sizing, size based on cube/block
+[ ] Add lego brick material (https://github.com/nicmosc/brick-builder/blob/master/app/components/engine/Brick.js)
 
 # Tuesday April 7 2020
 
@@ -9,10 +15,8 @@ Reading:
 https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html
 
 [x] Migrate to TypeScript
-[ ] Start using Constants and treat Cube as 2x2 square
-[ ] Abstract Cube into its own module
-[ ] Drop any notion of "default" sizing, size based on cube/block
-[ ] Add lego brick material (https://github.com/nicmosc/brick-builder/blob/master/app/components/engine/Brick.js)
+[ ] Add Brick selection
+
 
 # Monday April 6 2020
 
