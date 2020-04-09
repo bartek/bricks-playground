@@ -63,9 +63,9 @@ export const useRolloverPosition = (references: Object3D[]) => {
                 let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
 
                 // Each cell is 5 in width (100 size, divisions 20 = 5)
-                newVec.x = (Math.round(newVec.x / 5) * 5) + 2.5
-                newVec.z = (Math.round(newVec.z / 5) * 5) + 2.5
-                newVec.y = (Math.round(newVec.y / 5) * 5) + 2.5
+                newVec.x = (Math.round(newVec.x / 2.5) * 2.5) + 2.5
+                newVec.z = (Math.round(newVec.z / 2.5) * 2.5) + 2.5
+                newVec.y = (Math.round(newVec.y / 2.5) * 2.5) + 2.5
                 setRollover(newVec)
             }
         }

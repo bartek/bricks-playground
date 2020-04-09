@@ -10,7 +10,7 @@ import {
     saveToLocalStorage,
     restoreFromLocalStorage
 } from './data/localStorage'
-import { Cube, Rectangle } from './components/Cube'
+import { Brick2x2, Brick2x4 } from './components/Cube'
 import { Element, RolloverPosition } from './types'
 
 extend({ OrbitControls })
@@ -116,7 +116,7 @@ const PlaneEditor = (props: EditorType) => {
                 />
             </mesh>
             {blocks.map((block, idx) => {
-                return <Cube key={idx} inputRef={blockRefs[idx]} position={block.position} />
+                return <Brick2x2 key={idx} inputRef={blockRefs[idx]} position={block.position} />
             })}
             {gridHelper &&
                 <gridHelper ref={gridRef}

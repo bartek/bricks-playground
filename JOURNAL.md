@@ -2,6 +2,8 @@
 
 [x] Fixed issue in restoring references from localStorage
 [x] Added useMouseOnCanvas hook to prevent misplaced bricks
+[ ] Don't allow a brick to collide with another
+
 
 [ ] When we add a brick, we need to know its type, and then use that when rendering all the bricks (in blocks.map in PlaneEditor)
 [ ] Add Rectangle, and ensure Rollover considers current brick
