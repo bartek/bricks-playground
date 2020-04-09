@@ -1,17 +1,49 @@
+# Satuday April 12 2020
+
+[ ] Don't allow a brick to collide with another
+[ ] Add one test. Block placement calculation
+[ ] Abstract Cube into its own module
+[ ] Drop any notion of "default" sizing, size based on cube/block
+[ ] Add lego brick material (https://github.com/nicmosc/brick-builder/blob/master/app/components/engine/Brick.js)
+
+
+This was living in the onMouseDown stuff
+            // Before creating the block, ensure it's not colliding
+            // with anything else.
+            /*
+            if (intersect) {
+                console.log(intersect)
+                const meshBoundingBox = new THREE.Box3().setFromArray(Object.values(rolloverPosition))
+                const brickBoundingBox = new THREE.Box3().setFromArray(Object.values(intersect.point))
+
+                console.log(meshBoundingBox, brickBoundingBox)
+
+
+                const collision = meshBoundingBox.intersectsBox(brickBoundingBox)
+                if (collision) {
+                    console.log("Collision detected, verifying...")
+                    const dx = Math.abs(brickBoundingBox.max.x - meshBoundingBox.max.x);
+                    const dz = Math.abs(brickBoundingBox.max.z - meshBoundingBox.max.z);
+                    const yIntersect = brickBoundingBox.max.y - 9 > meshBoundingBox.min.y;
+                    if (yIntersect && dx !== 1 && dz !== 1) {
+                        // Can't create
+                        console.log("Not creating, collision!")
+                        return
+                    }
+                }
+            }
+            */
+
+
 # Wednesday April 9 2020
 
 [x] Fixed issue in restoring references from localStorage
 [x] Added useMouseOnCanvas hook to prevent misplaced bricks
-[ ] Don't allow a brick to collide with another
 
 
-[ ] When we add a brick, we need to know its type, and then use that when rendering all the bricks (in blocks.map in PlaneEditor)
-[ ] Add Rectangle, and ensure Rollover considers current brick
-[ ] Add one test. Block placement calculation
-[ ] Start using Constants and treat Cube as 2x2 square
-[ ] Abstract Cube into its own module
-[ ] Drop any notion of "default" sizing, size based on cube/block
-[ ] Add lego brick material (https://github.com/nicmosc/brick-builder/blob/master/app/components/engine/Brick.js)
+[x] When we add a brick, we need to know its type, and then use that when rendering all the bricks (in blocks.map in PlaneEditor)
+[x] Add Rectangle, and ensure Rollover considers current brick
+[x] Start using Constants and treat Cube as 2x2 square
 
 # Tuesday April 7 2020
 
