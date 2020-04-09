@@ -2,9 +2,11 @@ import React, { Component } from 'react'
 import { RolloverPosition } from '../types'
 
 type Props = {
-    key: number;
+    key?: number;
     position: RolloverPosition;
-    inputRef: any;
+    inputRef?: any;
+    opacity?: number;
+    transparent?: boolean;
 }
 
 // The absolute, minimal size of a lego brick that we'll
@@ -15,8 +17,7 @@ const ONE_PIXEL = 2.5
 
 export class Brick2x2 extends Component<Props> {
     render() {
-        const { position, inputRef } = this.props
-
+        const { position, inputRef, opacity, transparent } = this.props
         let scale = [
             ONE_PIXEL * 2,
             ONE_PIXEL * 2,
@@ -27,7 +28,7 @@ export class Brick2x2 extends Component<Props> {
                 scale={scale}
                 position={[position.x, position.y, position.z]}>
                 <boxBufferGeometry attach="geometry" />
-                <meshNormalMaterial attach="material" />
+                <meshNormalMaterial attach="material" opacity={opacity} transparent={transparent ? transparent : false} />
             </mesh>
         )
     }
@@ -35,7 +36,7 @@ export class Brick2x2 extends Component<Props> {
 
 export class Brick1x1 extends Component<Props> {
     render() {
-        const { position, inputRef } = this.props
+        const { position, inputRef, opacity } = this.props
 
         let scale = [
             ONE_PIXEL,
@@ -46,7 +47,7 @@ export class Brick1x1 extends Component<Props> {
         return (
             <mesh ref={inputRef} scale={scale} position={[position.x, position.y, position.z]}>
                 <boxBufferGeometry attach="geometry" />
-                <meshNormalMaterial attach="material" />
+                <meshNormalMaterial attach="material" opacity={opacity} />
             </mesh>
         )
     }
@@ -54,7 +55,7 @@ export class Brick1x1 extends Component<Props> {
 
 export class Brick2x4 extends Component<Props> {
     render() {
-        const { position, inputRef } = this.props
+        const { position, inputRef, opacity, transparent } = this.props
 
         let scale = [
             ONE_PIXEL * 4,
@@ -68,7 +69,7 @@ export class Brick2x4 extends Component<Props> {
                 position={[position.x, position.y, position.z]}
             >
                 <boxBufferGeometry attach="geometry" />
-                <meshNormalMaterial attach="material" />
+                <meshNormalMaterial attach="material" opacity={opacity} transparent={transparent ? transparent : false} />
             </mesh>
         )
     }

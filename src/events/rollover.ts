@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useThree } from 'react-three-fiber'
 import * as THREE from 'three'
-import { Object3D } from 'three'
+import { Object3D, Intersection } from 'three'
+import { RolloverPosition } from '../types'
 
 // Capture if the mouse is on canvas, to prevent misplacement
 // of blocks
@@ -38,7 +39,8 @@ export const useRolloverPosition = (references: Object3D[]) => {
         camera
     } = useThree()
 
-    const [rolloverPosition, setRollover] = useState({ x: 0, y: 0, z: 0 })
+    const [rolloverPosition, setRollover] = useState<RolloverPosition>({ x: 0, y: 0, z: 0 })
+    const [intersect, setIntersect] = useState<Intersection | null>(null)
 
     useEffect(() => {
         const setIntersections = () => {
@@ -48,14 +50,14 @@ export const useRolloverPosition = (references: Object3D[]) => {
                 return
             }
 
-
             // Check for intersections against the grid helper
             raycaster.setFromCamera(mouse.clone(), camera)
             let intersects = raycaster.intersectObjects(references, true)
             if (intersects.length > 0) {
 
-                // This is the grid intersection
+                // The intersect being considered, brick or plane.
                 let intersect = intersects[0]
+                setIntersect(intersect)
 
                 // Store the new position in a Vector, so we can do vector math on it!
                 // FIXME: There may be better ways, by copying the position of the intersect.point
@@ -75,5 +77,8 @@ export const useRolloverPosition = (references: Object3D[]) => {
         }
     })
 
-    return rolloverPosition
+    return {
+        rolloverPosition: rolloverPosition,
+        intersect: intersect
+    }
 }

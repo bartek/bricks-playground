@@ -5,7 +5,8 @@ export type Element = {
         x: number;
         y: number;
         z: number
-    }
+    },
+    componentType: string
 }
 
 

@@ -41,30 +41,58 @@
 
     .app canvas {
       flex-grow: 1;
+      z-index: 100;
       background-color: #000;
     }
 
-    .header {
+    .toolbar {
       background-color: #6D5ACf;
       max-height: 20vh;
     }
 
-    .header button {
+    .toolbar button {
       background-color: #FFFD01;
       color: rgb(15, 13, 13);
       border: none;
       margin-top: 12px;
     }
 
-    .header ul {
+    .toolbar ul {
       list-style: none;
       margin-top: 0;
     }
 
-    .header ul>li {
+    .toolbar ul>li {
       padding-right: 0.5em;
       padding-left: 0.5em;
       display: inline-block;
+    }
+
+    .picker {
+      position: fixed;
+      z-index: 900;
+      top: 100px;
+      left: 20px;
+      max-width: 120px;
+
+      background-color: #000;
+    }
+
+    .picker ul {
+      list-style: none;
+    }
+
+    .picker ul>li {
+      display: inline-block;
+    }
+
+    .picker button {
+      margin: 0.5em;
+      padding: 0.2em;
+    }
+
+    .picker ul>li.active {
+      background-color: #6D5ACf;
     }
   </style>
 </head>
