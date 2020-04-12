@@ -18,16 +18,11 @@ const ONE_PIXEL = 2.5
 export class Brick2x2 extends Component<Props> {
     render() {
         const { position, inputRef, opacity, transparent } = this.props
-        let scale = [
-            ONE_PIXEL * 2,
-            ONE_PIXEL * 2,
-            ONE_PIXEL * 2,
-        ]
+
         return (
             <mesh ref={inputRef}
-                scale={scale}
                 position={[position.x, position.y, position.z]}>
-                <boxBufferGeometry attach="geometry" />
+                <boxBufferGeometry args={[2.5, 2.5, 2.5]} attach="geometry" />
                 <meshNormalMaterial attach="material" opacity={opacity} transparent={transparent ? transparent : false} />
             </mesh>
         )
@@ -57,18 +52,12 @@ export class Brick2x4 extends Component<Props> {
     render() {
         const { position, inputRef, opacity, transparent } = this.props
 
-        let scale = [
-            ONE_PIXEL * 4,
-            ONE_PIXEL * 2,
-            ONE_PIXEL * 2,
-        ]
         return (
             <mesh
                 ref={inputRef}
-                scale={scale}
                 position={[position.x, position.y, position.z]}
             >
-                <boxBufferGeometry attach="geometry" />
+                <boxBufferGeometry args={[5, 2.5, 2.5]} attach="geometry" />
                 <meshNormalMaterial attach="material" opacity={opacity} transparent={transparent ? transparent : false} />
             </mesh>
         )

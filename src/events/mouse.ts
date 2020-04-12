@@ -32,10 +32,8 @@ export const useMouseDown = () => {
             }
         }
 
-        // On mount
         document.addEventListener('mousedown', handleDocumentMouseDown)
 
-        // When umounted
         return () => {
             document.removeEventListener('mousedown', handleDocumentMouseDown)
         }

@@ -6,7 +6,7 @@ export type Element = {
         y: number;
         z: number
     },
-    componentType: string
+    brickIndex: number
 }
 
 
