@@ -25,9 +25,8 @@ export class Brick2x2 extends Component<Props> {
         ]
         return (
             <mesh ref={inputRef}
-                scale={scale}
                 position={[position.x, position.y, position.z]}>
-                <boxBufferGeometry attach="geometry" />
+                <boxGeometry args={[2.5, 2.5, 2.5]} attach="geometry" />
                 <meshNormalMaterial attach="material" opacity={opacity} transparent={transparent ? transparent : false} />
             </mesh>
         )

@@ -1,11 +1,14 @@
-# Satuday April 12 2020
+# Saturday April 12 2020
 
+[ ] Rollover should be an actual component, in its fullsome. Not just the positions
+        This will allow proper collision detection etc.
+        It's the brick we want to place, but transparent. That keeps it sane
+
+[ ] Brick rollover position should go from top left of mouse?
 [ ] Don't allow a brick to collide with another
 [ ] Add one test. Block placement calculation
 [ ] Abstract Cube into its own module
 [ ] Drop any notion of "default" sizing, size based on cube/block
-[ ] Add lego brick material (https://github.com/nicmosc/brick-builder/blob/master/app/components/engine/Brick.js)
-
 
 This was living in the onMouseDown stuff
             // Before creating the block, ensure it's not colliding
