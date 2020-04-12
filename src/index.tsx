@@ -42,19 +42,6 @@ function getBrickComponent(brick: string) {
     return BrickComponent
 }
 
-function RollOver(props: {
-    position: RolloverPosition,
-    brickType: string
-}) {
-    const { position, brickType } = props
-
-    let Component = getBrickComponent(brickType)
-
-    return (
-        <Component position={position} opacity={0.5} transparent={true} />
-    )
-}
-
 // Adds both a visual grid and defines the geometry necessary for
 // snapping blocks to.
 
@@ -77,9 +64,6 @@ const PlaneEditor = (props: EditorType) => {
 
 
     const [blocks, setBlocks] = useState(elements)
-
-    // TODO: Consider useReducer for this:
-    // https://reactjs.org/docs/hooks-reference.html#usereducer
     const [blockRefs, setBlockRefs] = useState<React.RefObject<HTMLDivElement>[]>(
         Array.from({ length: elements.length }, a => createRef())
     )
@@ -90,14 +74,27 @@ const PlaneEditor = (props: EditorType) => {
     const isMouseDown = useMouseDown()
     const isMouseOnCanvas = useMouseOnCanvas()
 
-    // Capture the rollover position, in consideration of the
-    // existing blocks and base plane.
-    const { rolloverPosition, intersect } = useRolloverPosition([
+    let RolloverComponent = getBrickComponent(currentBrick)
+    let RolloverComponentRef = useRef<HTMLDivElement>(null)
+
+    // Provide the expected brick to lay down, and then identify
+    // its position based on the collection of existing blocks
+    // and the plane itself.
+    const references = [
         ...blockRefs.filter(
             (b: React.RefObject<any>) => b.current
         ).map((b: React.RefObject<any>) => b.current),
         planeRef.current
-    ])
+    ]
+
+    // Capture the rollover position, in consideration of the
+    // existing blocks and base plane.
+    // The rollover position and intersect are then used when checking
+    // for collision and eventually placing a new brick.
+    const { rolloverPosition, intersect } = useRolloverPosition(
+        RolloverComponentRef,
+        references
+    )
 
     if (isMouseOnCanvas && isMouseDown) {
         setTimeout(() => {
@@ -117,6 +114,14 @@ const PlaneEditor = (props: EditorType) => {
         }, 50)
     }
 
+    // Rollover should consider brick dimensions, position / intersect (same thing)
+    // This data will be useful when making the actual brick
+    // For each brick, we don't want the component -- those will all be the same,
+    // but rather, the JSON representation of it?
+    // We may want to know components for trickier shapes, but for now, that's not a big
+    // deal. Most things can be derived from the base block
+    // Consider components though, so we can say add, a cylinder block.
+
 
     // Update localStorage on each change in blocks
     useEffect(() => {
@@ -126,7 +131,10 @@ const PlaneEditor = (props: EditorType) => {
     return (
         <group>
             <ambientLight />
-            <RollOver brickType={currentBrick} position={rolloverPosition} />
+            <RolloverComponent
+                inputRef={RolloverComponentRef}
+                position={rolloverPosition} />
+
             <mesh ref={planeRef} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeBufferGeometry
                     attach="geometry"
@@ -136,7 +144,6 @@ const PlaneEditor = (props: EditorType) => {
                     flatShading
                 />
             </mesh>
-            r
             {blocks.map((block, idx) => {
                 let Component = getBrickComponent(block.componentType)
                 return <Component key={idx} inputRef={blockRefs[idx]} position={block.position} />

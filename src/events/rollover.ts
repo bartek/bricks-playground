@@ -31,8 +31,7 @@ export const useMouseOnCanvas = () => {
     return mouseOnCanvas
 }
 
-// TODO: Needs to consider block currently being used.
-export const useRolloverPosition = (references: Object3D[]) => {
+export const useRolloverPosition = (ref: React.RefObject<any>, references: Object3D[]) => {
     const {
         raycaster,
         mouse,
@@ -50,6 +49,11 @@ export const useRolloverPosition = (references: Object3D[]) => {
                 return
             }
 
+            if (ref.current === null) {
+                console.warn("No component set for rollover brick")
+                return
+            }
+
             // Check for intersections against the grid helper
             raycaster.setFromCamera(mouse.clone(), camera)
             let intersects = raycaster.intersectObjects(references, true)
@@ -59,16 +63,19 @@ export const useRolloverPosition = (references: Object3D[]) => {
                 let intersect = intersects[0]
                 setIntersect(intersect)
 
-                // Store the new position in a Vector, so we can do vector math on it!
-                // FIXME: There may be better ways, by copying the position of the intersect.point
-                // And adding the face, etc. Not sure why yet, so hold off on that for now.
-                let newVec = new THREE.Vector3(intersect.point.x, intersect.point.y, intersect.point.z)
+                // To obtain the new position of the rollover, we do a bunch
+                // of math I don't *really* understand, but is common place in
+                // snapping things to a grid. The short of the answer is here:
+                // https://gamedev.stackexchange.com/questions/33140/how-can-i-snap-a-game-objects-position-to-a-grid
 
-                // Each cell is 5 in width (100 size, divisions 20 = 5)
-                newVec.x = (Math.round(newVec.x / 2.5) * 2.5) + 2.5
-                newVec.z = (Math.round(newVec.z / 2.5) * 2.5) + 2.5
-                newVec.y = (Math.round(newVec.y / 2.5) * 2.5) + 2.5
-                setRollover(newVec)
+                let rollover = ref.current
+                let [width, height, depth] = [2.5, 2.5, 2.5]
+                rollover.position.copy(intersect.point).add(intersect.face!.normal)
+                rollover.position.divide(new THREE.Vector3(width, height, depth)).floor()
+                    .multiply(new THREE.Vector3(width, height, depth))
+                    .add(new THREE.Vector3(width / 2, height / 2, depth / 2))
+
+                setRollover(rollover.position)
             }
         }
         window.addEventListener('mousemove', setIntersections)
