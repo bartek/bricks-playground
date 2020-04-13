@@ -3,6 +3,7 @@ import { useThree } from 'react-three-fiber'
 import * as THREE from 'three'
 import { Object3D, Intersection } from 'three'
 import { RolloverPosition } from '../types'
+import { pixel } from '../bricks'
 
 // Capture if the mouse is on canvas, to prevent misplacement
 // of blocks
@@ -87,7 +88,7 @@ export const useRolloverPosition = (ref: React.RefObject<any>, references: Objec
                 setIntersect(intersect)
 
                 let rollover = ref.current
-                let [width, height, depth] = [2.5, 2.5, 2.5]
+                let [width, height, depth] = [pixel, pixel, pixel]
 
                 // For whatever reason (I blame the orbital camera), the `y` point
                 // jumps between neg/positive. We'll never go below the plane, so
