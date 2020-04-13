@@ -6,7 +6,8 @@ export type Element = {
         y: number;
         z: number
     },
-    brickIndex: number
+    brickIndex: number,
+    color: string,
 }
 
 

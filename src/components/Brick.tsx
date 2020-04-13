@@ -13,7 +13,7 @@ type Props = {
     inputRef?: any;
     rotation?: number[];
     opacity?: number;
-    transparent?: boolean;
+    color?: string
 }
 
 export class Brick extends Component<Props> {
@@ -23,8 +23,8 @@ export class Brick extends Component<Props> {
             rotation,
             position,
             inputRef,
+            color,
             opacity,
-            transparent
         } = this.props
 
         return (
@@ -32,7 +32,11 @@ export class Brick extends Component<Props> {
                 position={[position.x, position.y, position.z]}
                 rotation={rotation}>
                 <boxBufferGeometry args={dimensions} attach="geometry" />
-                <meshNormalMaterial attach="material" opacity={opacity} transparent={transparent ? transparent : false} />
+                <meshStandardMaterial
+                    attach="material"
+                    opacity={opacity}
+                    color={color ? color : 0x2194ce}
+                />
             </mesh>
         )
     }

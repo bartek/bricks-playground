@@ -19,6 +19,7 @@ import {
     getBrickSettings,
     getBrickComponent
 } from './bricks'
+import { GithubPicker } from 'react-color'
 
 extend({ OrbitControls })
 
@@ -38,6 +39,7 @@ type EditorType = {
     divisions: number;
     gridHelper: boolean;
     activeBrick: number;
+    activeColor: string;
 }
 
 const PlaneEditor = (props: EditorType) => {
@@ -46,6 +48,7 @@ const PlaneEditor = (props: EditorType) => {
         gridSize,
         divisions,
         activeBrick,
+        activeColor,
         gridHelper,
     } = props;
 
@@ -91,6 +94,7 @@ const PlaneEditor = (props: EditorType) => {
             // in JS are by reference.
             const newBlock = {
                 position: { ...rolloverPosition },
+                color: activeColor,
                 brickIndex: activeBrick
             }
             setBlocks([...blocks, newBlock])
@@ -115,7 +119,9 @@ const PlaneEditor = (props: EditorType) => {
             <RolloverComponent
                 dimensions={activeBrickSettings.dimensions!}
                 inputRef={RolloverComponentRef}
+                opacity={0.5}
                 position={rolloverPosition}
+                color={activeColor}
                 rotation={[0, rotation, 0]} />
 
             <mesh ref={planeRef} rotation={[-Math.PI / 2, 0, 0]}>
@@ -134,6 +140,7 @@ const PlaneEditor = (props: EditorType) => {
                     key={idx}
                     dimensions={settings.dimensions}
                     inputRef={blockRefs[idx]}
+                    color={block.color}
                     position={block.position} />
             })}
             {gridHelper &&
@@ -150,6 +157,7 @@ type MainProps = {
     elements: Element[];
     gridHelper: boolean;
     activeBrick: number;
+    activeColor: string;
 }
 function Main(props: MainProps) {
     const scene = useRef()
@@ -179,6 +187,10 @@ function App() {
 
     const [activeBrick, setActiveBrick] = useState(0)
 
+    // Colour pickin'
+    const [colorPicker, setColorPicker] = useState(false)
+    const [activeColor, setActiveColor] = useState("")
+
     // Load elements from localStorage
     const elements = restoreFromLocalStorage()
 
@@ -195,6 +207,19 @@ function App() {
                     </li>
                     <li>
                         <button onClick={() => clearStorage()}>Erase</button>
+                    </li>
+                    <li>
+                        <button onClick={() => setColorPicker(!colorPicker)}>
+                            Color
+                        </button>
+                        {colorPicker && (
+                            <GithubPicker
+                                onChangeComplete={(color) => {
+                                    setActiveColor(color.hex)
+                                    setColorPicker(!colorPicker)
+                                }}
+                            />
+                        )}
                     </li>
                 </ul>
             </div>
@@ -223,6 +248,7 @@ function App() {
                 <Main
                     elements={elements}
                     activeBrick={activeBrick}
+                    activeColor={activeColor}
                     gridHelper={gridHelper}
                 />
             </Canvas>
