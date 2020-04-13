@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { RolloverPosition } from '../types'
 
+
 type Dimensions = {
 
 }
@@ -13,7 +14,8 @@ type Props = {
     inputRef?: any;
     rotation?: number[];
     opacity?: number;
-    color?: string
+    color?: string;
+    texture?: any
 }
 
 export class Brick extends Component<Props> {
@@ -24,18 +26,21 @@ export class Brick extends Component<Props> {
             position,
             inputRef,
             color,
+            texture,
             opacity,
         } = this.props
 
         return (
             <mesh ref={inputRef}
                 position={[position.x, position.y, position.z]}
-                rotation={rotation}>
+                rotation={rotation}
+                castShadow>
                 <boxBufferGeometry args={dimensions} attach="geometry" />
                 <meshStandardMaterial
                     attach="material"
                     opacity={opacity}
                     color={color ? color : 0x2194ce}
+                    map={texture}
                 />
             </mesh>
         )

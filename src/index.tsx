@@ -1,7 +1,8 @@
-import React, { createRef, useEffect, useRef, useState } from 'react'
+import React, { createRef, useMemo, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Canvas, extend, useThree, ReactThreeFiber } from 'react-three-fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { TextureLoader } from 'three'
 import { useMouseDown } from './events/mouse'
 import {
     useMouseRotation,
@@ -20,6 +21,7 @@ import {
     getBrickComponent
 } from './bricks'
 import { GithubPicker } from 'react-color'
+
 
 extend({ OrbitControls })
 
@@ -87,6 +89,12 @@ const PlaneEditor = (props: EditorType) => {
         references
     )
 
+    let texture = useMemo(() => new TextureLoader().load('/static/plastic.jpg'), [
+        '/static/plastic.jpg'
+    ])
+
+
+
     if (isMouseOnCanvas && isMouseDown) {
         setTimeout(() => {
 
@@ -141,6 +149,7 @@ const PlaneEditor = (props: EditorType) => {
                     dimensions={settings.dimensions}
                     inputRef={blockRefs[idx]}
                     color={block.color}
+                    texture={texture}
                     position={block.position} />
             })}
             {gridHelper &&
