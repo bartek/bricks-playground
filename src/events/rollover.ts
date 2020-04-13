@@ -31,6 +31,29 @@ export const useMouseOnCanvas = () => {
     return mouseOnCanvas
 }
 
+// Scaffolding for rotation
+export const useMouseRotation = () => {
+    const [rotation, setRotation] = useState(0)
+
+    useEffect(() => {
+        const onMouseUp = (e: MouseEvent) => {
+            if (e.button !== 2) {
+                // Right button was not clicked, do nothing
+                return
+            }
+
+            setRotation(0)
+        }
+
+        window.addEventListener('mouseup', onMouseUp)
+        return () => {
+            window.removeEventListener('mouseup', onMouseUp)
+        }
+    })
+
+    return rotation
+}
+
 export const useRolloverPosition = (ref: React.RefObject<any>, references: Object3D[]) => {
     const {
         raycaster,

@@ -3,15 +3,22 @@ import ReactDOM from 'react-dom'
 import { Canvas, extend, useThree, ReactThreeFiber } from 'react-three-fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { useMouseDown } from './events/mouse'
-import { useRolloverPosition, useMouseOnCanvas } from './events/rollover'
+import {
+    useMouseRotation,
+    useRolloverPosition,
+    useMouseOnCanvas
+} from './events/rollover'
 import {
     clearStorage,
     saveToLocalStorage,
     restoreFromLocalStorage
 } from './data/localStorage'
-import { Brick2x2, Brick2x4 } from './components/Cube'
 import { Element, RolloverPosition } from './types'
-import { availableBricks, getBrickComponent } from './bricks'
+import {
+    availableBricks,
+    getBrickSettings,
+    getBrickComponent
+} from './bricks'
 
 extend({ OrbitControls })
 
@@ -52,7 +59,9 @@ const PlaneEditor = (props: EditorType) => {
 
     const isMouseDown = useMouseDown()
     const isMouseOnCanvas = useMouseOnCanvas()
+    const rotation = useMouseRotation()
 
+    let activeBrickSettings = getBrickSettings(activeBrick)
     let RolloverComponent = getBrickComponent(activeBrick)
     let RolloverComponentRef = useRef<HTMLDivElement>(null)
 
@@ -104,8 +113,10 @@ const PlaneEditor = (props: EditorType) => {
         <group>
             <ambientLight />
             <RolloverComponent
+                dimensions={activeBrickSettings.dimensions!}
                 inputRef={RolloverComponentRef}
-                position={rolloverPosition} />
+                position={rolloverPosition}
+                rotation={[0, rotation, 0]} />
 
             <mesh ref={planeRef} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeBufferGeometry
@@ -117,8 +128,13 @@ const PlaneEditor = (props: EditorType) => {
                 />
             </mesh>
             {blocks.map((block, idx) => {
+                let settings = getBrickSettings(block.brickIndex)
                 let Component = getBrickComponent(block.brickIndex)
-                return <Component key={idx} inputRef={blockRefs[idx]} position={block.position} />
+                return <Component
+                    key={idx}
+                    dimensions={settings.dimensions}
+                    inputRef={blockRefs[idx]}
+                    position={block.position} />
             })}
             {gridHelper &&
                 <gridHelper ref={gridRef}
