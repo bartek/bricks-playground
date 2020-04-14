@@ -1,4 +1,4 @@
-import React, { createRef, useMemo, useEffect, useRef, useState } from 'react'
+import React, { Suspense, createRef, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { Canvas, extend, useThree, ReactThreeFiber } from 'react-three-fiber'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -89,12 +89,6 @@ const PlaneEditor = (props: EditorType) => {
         references
     )
 
-    let texture = useMemo(() => new TextureLoader().load('/static/plastic.jpg'), [
-        '/static/plastic.jpg'
-    ])
-
-
-
     if (isMouseOnCanvas && isMouseDown) {
         setTimeout(() => {
 
@@ -123,15 +117,16 @@ const PlaneEditor = (props: EditorType) => {
 
     return (
         <group>
-            <ambientLight />
-            <RolloverComponent
-                dimensions={activeBrickSettings.dimensions!}
-                inputRef={RolloverComponentRef}
-                opacity={0.5}
-                position={rolloverPosition}
-                color={activeColor}
-                rotation={[0, rotation, 0]} />
-
+            <pointLight intensity={0.5} position={[10, 20, 10]} />
+            <Suspense fallback={null}>
+                <RolloverComponent
+                    dimensions={activeBrickSettings.dimensions!}
+                    inputRef={RolloverComponentRef}
+                    opacity={0.5}
+                    position={rolloverPosition}
+                    color={activeColor}
+                    rotation={[0, rotation, 0]} />
+            </Suspense>
             <mesh ref={planeRef} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeBufferGeometry
                     attach="geometry"
@@ -141,17 +136,20 @@ const PlaneEditor = (props: EditorType) => {
                     flatShading
                 />
             </mesh>
-            {blocks.map((block, idx) => {
-                let settings = getBrickSettings(block.brickIndex)
-                let Component = getBrickComponent(block.brickIndex)
-                return <Component
-                    key={idx}
-                    dimensions={settings.dimensions}
-                    inputRef={blockRefs[idx]}
-                    color={block.color}
-                    texture={texture}
-                    position={block.position} />
-            })}
+            <Suspense fallback={null}>
+                {blocks.map((block, idx) => {
+                    let settings = getBrickSettings(block.brickIndex)
+                    let Component = getBrickComponent(block.brickIndex)
+                    return <Component
+                        key={idx}
+                        dimensions={settings.dimensions}
+                        inputRef={blockRefs[idx]}
+                        color={block.color}
+                        position={block.position} />
+
+
+                })}
+            </Suspense>
             {gridHelper &&
                 <gridHelper ref={gridRef}
                     args={[gridSize, divisions, 0x880000]}

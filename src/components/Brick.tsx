@@ -1,10 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
+import * as THREE from 'three'
+import { useLoader } from 'react-three-fiber'
 import { RolloverPosition } from '../types'
-
-
-type Dimensions = {
-
-}
+import plasticImg from './images/plastic.jpg'
 
 // FIXME: Type this out proper.
 type Props = {
@@ -15,34 +13,34 @@ type Props = {
     rotation?: number[];
     opacity?: number;
     color?: string;
-    texture?: any
 }
 
-export class Brick extends Component<Props> {
-    render() {
-        const {
-            dimensions,
-            rotation,
-            position,
-            inputRef,
-            color,
-            texture,
-            opacity,
-        } = this.props
+export const Brick = (props: Props) => {
+    const {
+        dimensions,
+        rotation,
+        position,
+        inputRef,
+        color,
+        opacity,
+    } = props
 
-        return (
-            <mesh ref={inputRef}
-                position={[position.x, position.y, position.z]}
-                rotation={rotation}
-                castShadow>
-                <boxBufferGeometry args={dimensions} attach="geometry" />
-                <meshStandardMaterial
-                    attach="material"
-                    opacity={opacity}
-                    color={color ? color : 0x2194ce}
-                    map={texture}
-                />
-            </mesh>
-        )
-    }
+    const texture = useLoader(THREE.TextureLoader, plasticImg)
+
+    console.log("???", texture)
+    return (
+        <mesh ref={inputRef}
+            position={[position.x, position.y, position.z]}
+            rotation={rotation}
+            castShadow>
+            <boxBufferGeometry args={dimensions} attach="geometry" />
+            <meshStandardMaterial
+                attach="material"
+                opacity={opacity}
+                color={color ? color : 0x2194ce}
+                map={texture}
+            />
+        </mesh>
+
+    )
 }
