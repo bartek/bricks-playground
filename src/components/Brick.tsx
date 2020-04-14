@@ -27,7 +27,6 @@ export const Brick = (props: Props) => {
 
     const texture = useLoader(THREE.TextureLoader, plasticImg)
 
-    console.log("???", texture)
     return (
         <mesh ref={inputRef}
             position={[position.x, position.y, position.z]}
